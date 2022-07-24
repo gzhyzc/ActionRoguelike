@@ -19,6 +19,9 @@ public:
 	ASCharacter();
 
 protected:
+
+	FTimerHandle TimerHandle_PrimaryAttack;
+	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -28,21 +31,28 @@ protected:
 	UPROPERTY(VisibleAnywhere);
 		UCameraComponent* CameraComp;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,Category = "Attack")
 		TSubclassOf<AActor> projectileClass;
 
 	UPROPERTY(VisibleAnywhere)
 		USInteractionComponent* InteractionComp;
+	
+	UPROPERTY(EditAnywhere,Category = "Attack")
+	UAnimMontage* AttackAnim;
 
 	void MoveForward(float value);
 
 	void MoveRight(float value);
 
+	void PrimaryAttack_TimeElapsed();
+	
 	void PrimaryAttack();
+	
+	void PrimaryInteract();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
+	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 

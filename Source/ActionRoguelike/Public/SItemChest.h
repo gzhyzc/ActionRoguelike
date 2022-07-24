@@ -20,10 +20,10 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
 
-	UPROPERTY(VisibleAnywhere,Category = "Mesh")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Mesh")
 	UStaticMeshComponent* BaseMesh;
 
-	UPROPERTY(VisibleAnywhere,Category = "Mesh")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Mesh")
 	UStaticMeshComponent* LidMesh;
 
 	// Called when the game starts or when spawned

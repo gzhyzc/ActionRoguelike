@@ -2,10 +2,14 @@
 
 
 #include "SInteractionComponent.h"
-#include "../Public/SGameplayInterface.h"
 
-void USInteractionComponent::PrimaryInteract()
-{
+#include "DrawDebugHelpers.h"
+#include "../Public/SGameplayInterface.h"
+#include "SInteractionComponent.h"
+#include "DrawDebugHelpers.h"
+
+ void USInteractionComponent::PrimaryInteract()
+ {
 	FCollisionObjectQueryParams objectQueryParams;
 	objectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
@@ -17,19 +21,39 @@ void USInteractionComponent::PrimaryInteract()
 
 	FVector End = EyeLocation + (EyeRotation.Vector()*1000);
 
-	FHitResult Hit;
-	GetWorld()->LineTraceMultiByObjectType(Hit,EyeLocation,End,objectQueryParams);
+	//FHitResult Hit;
+	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit,EyeLocation,End,objectQueryParams);
 
-	AActor* HitActor = Hit.GetActor();
-	if (HitActor)
-	{
-		if (HitActor->Implements<ISGameplayInterface>())
-		{
-			APawn* MyPawn = Cast<APawn>(MyOwner);
-			ISGameplayInterface::Execute_Interact(HitActor,GetOwner());
-		}
-	}
+ 	TArray<FHitResult> Hits;
+ 	float Radius = 30.0f;
+
+ 	FCollisionShape Shape;
+ 	Shape.SetSphere(Radius);
+ 	
+ 	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits,EyeLocation,End,FQuat::Identity,objectQueryParams,Shape);
+
+ 	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
+
+ 	for (FHitResult Hit : Hits)
+ 	{
+ 		AActor* HitActor = Hit.GetActor();
+ 		if (HitActor)
+ 		{
+ 			if (HitActor->Implements<USGameplayInterface>())
+ 			{
+ 				APawn* MyPawn = Cast<APawn>(MyOwner);
+ 				ISGameplayInterface::Execute_Interact(HitActor,MyPawn);
+
+ 				break;
+ 			}
+ 		}
+ 		DrawDebugSphere(GetWorld(),Hit.ImpactPoint,Radius,32,LineColor,false,2.0f);
+ 	}
+ 	
+ 	DrawDebugLine(GetWorld(),EyeLocation,End,LineColor,false,2.0f,0,2.0f);
 }
+
+
 
 // Sets default values for this component's properties
 USInteractionComponent::USInteractionComponent()
