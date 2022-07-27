@@ -18,6 +18,9 @@ public:
 
 protected:
 
+	UPROPERTY(EditAnywhere,Category = "Vlaue")
+	float Damage = 25;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	UStaticMeshComponent* MeshComp;
 

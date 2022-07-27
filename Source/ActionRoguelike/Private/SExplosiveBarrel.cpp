@@ -2,8 +2,9 @@
 
 
 #include "SExplosiveBarrel.h"
-
 #include "DrawDebugHelpers.h"
+#include "SAttributeComponent.h"
+
 
 // Sets default values
 ASExplosiveBarrel::ASExplosiveBarrel()
@@ -40,12 +41,18 @@ void ASExplosiveBarrel::OnActorHit(UPrimitiveComponent* HitComponent, AActor* Ot
                                    UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ForceComp->FireImpulse();
-	UE_LOG(LogTemp,Log,TEXT("OnActorHit in Explosive Barrel"));
 
-	UE_LOG(LogTemp,Warning,TEXT("OtherActor: &s,at game time: %f"),*GetNameSafe(OtherActor),GetWorld()->TimeSeconds);
+	USAttributeComponent* aa = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+	if (aa)
+	{
+		aa->ApplyHealthChange(-Damage);
+	}
+	//UE_LOG(LogTemp,Log,TEXT("OnActorHit in Explosive Barrel"));
 
-	FString CombinedString = FString::Printf(TEXT("Hit at location:%s"),*Hit.ImpactPoint.ToString());
-	DrawDebugString(GetWorld(),Hit.ImpactPoint,CombinedString,nullptr,FColor::Green,2.0f,true);
+	//UE_LOG(LogTemp,Warning,TEXT("OtherActor: &s,at game time: %f"),*GetNameSafe(OtherActor),GetWorld()->TimeSeconds);
+
+	//FString CombinedString = FString::Printf(TEXT("Hit at location:%s"),*Hit.ImpactPoint.ToString());
+	//DrawDebugString(GetWorld(),Hit.ImpactPoint,CombinedString,nullptr,FColor::Green,2.0f,true);
 }
 
 // Called when the game starts or when spawned
