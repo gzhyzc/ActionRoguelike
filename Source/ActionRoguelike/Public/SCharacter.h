@@ -21,6 +21,12 @@ public:
 
 protected:
 
+	UPROPERTY(VisibleAnywhere,Category = "Effects")
+	FName TimeToHitParamName;
+
+	UPROPERTY(VisibleAnywhere,Category = "Effects")
+	FName HandSocketName;
+	
 	float AttackAnimDelay = 0.2f;
 
 	FTimerHandle TimerHandle_PrimaryAttack;
@@ -73,7 +79,7 @@ protected:
 	void Dash_TimeElapsed();
 
 	void PrimaryInteract();
-
+	
 	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 
 	UFUNCTION()

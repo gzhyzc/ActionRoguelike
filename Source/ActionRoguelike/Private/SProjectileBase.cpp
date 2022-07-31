@@ -17,10 +17,13 @@ ASProjectileBase::ASProjectileBase()
 	SphereComp->SetCollisionProfileName("Projectile");
 	SphereComp->OnComponentHit.AddDynamic(this, &ASProjectileBase::OnActorHit);
 	RootComponent = SphereComp;
-
+	
 	EffectComp = CreateDefaultSubobject<UParticleSystemComponent>("EffectComp");
 	EffectComp->SetupAttachment(SphereComp);
 
+	AudioComp = CreateDefaultSubobject<UAudioComponent>("AudioComp");
+	AudioComp->SetupAttachment(RootComponent);
+	
 	MoveComp = CreateDefaultSubobject<UProjectileMovementComponent>("MoveComp");
 	MoveComp->InitialSpeed = 1000.0f;
 	MoveComp->bRotationRemainsVertical = true;

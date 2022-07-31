@@ -24,6 +24,10 @@ public:
 	ASProjectileBase();
 
 protected:
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
+	UAudioComponent* AudioComp;
+	
 	UPROPERTY(EditDefaultsOnly,Category = "Effects")
 	UParticleSystem* ImpactVFX;
 

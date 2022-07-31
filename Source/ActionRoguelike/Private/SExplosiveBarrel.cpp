@@ -45,7 +45,7 @@ void ASExplosiveBarrel::OnActorHit(UPrimitiveComponent* HitComponent, AActor* Ot
 	USAttributeComponent* aa = Cast<USAttributeComponent>(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
 	if (aa)
 	{
-		aa->ApplyHealthChange(-Damage);
+		aa->ApplyHealthChange(GetInstigator(),-Damage);
 	}
 	//UE_LOG(LogTemp,Log,TEXT("OnActorHit in Explosive Barrel"));
 
