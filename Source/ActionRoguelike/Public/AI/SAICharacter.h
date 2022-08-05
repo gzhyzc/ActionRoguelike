@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SAttributeComponent.h"
 #include "GameFramework/Character.h"
 #include "SAICharacter.generated.h"
 
 class UPawnSensingComponent;
 class USAttributeComponent;
+class USWorldUserWidget;
+class USActionComponent;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASAICharacter : public ACharacter
@@ -21,8 +22,20 @@ public:
 
 protected:
 
+	UPROPERTY()
+	USWorldUserWidget*  ActiveHealthBar;
+
+	UPROPERTY(EditDefaultsOnly,Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> SpottedWidgetClass;
+
 	UPROPERTY(VisibleAnywhere,Category = "Effects")
 	FName TimeToHitParamName;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TargetActorKey;
 	
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
@@ -38,9 +51,15 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
 		USAttributeComponent* AtrributeComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+		USActionComponent* ActorComp;
+
 	UFUNCTION()
 	void SetTargetActor(AActor* NewTarget);
 	
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	AActor* GetTargetActor() const;
+
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 
@@ -48,5 +67,6 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 
 };

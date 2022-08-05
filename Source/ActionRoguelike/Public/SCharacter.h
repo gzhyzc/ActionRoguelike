@@ -4,11 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
-#include "SInteractionComponent.h"
-#include "SAttributeComponent.h"
 #include "SCharacter.generated.h"
+
+class USActionComponent;
+class UCameraComponent;
+class USpringArmComponent;
+class USInteractionComponent;
+class UAnimMontage;
+class USAttributeComponent;
+class UParticleSystem;
 
 UCLASS()
 class ACTIONROGUELIKE_API ASCharacter : public ACharacter
@@ -23,17 +27,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,Category = "Effects")
 	FName TimeToHitParamName;
-
-	UPROPERTY(VisibleAnywhere,Category = "Effects")
-	FName HandSocketName;
-	
-	float AttackAnimDelay = 0.2f;
-
-	FTimerHandle TimerHandle_PrimaryAttack;
-
-	FTimerHandle TimerHandle_BlackHoleAttack;
-
-	FTimerHandle TimerHandle_Dash;
 	
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -44,43 +37,30 @@ protected:
 	UPROPERTY(VisibleAnywhere);
 		UCameraComponent* CameraComp;
 
-	UPROPERTY(EditAnywhere,Category = "Attack")
-		TSubclassOf<AActor> ProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		TSubclassOf<AActor> BlackHoleProjectileClass;
-
-	UPROPERTY(EditAnywhere, Category = "Attack")
-		TSubclassOf<AActor> DashProjectileClass;
-
 	UPROPERTY(VisibleAnywhere)
 		USInteractionComponent* InteractionComp;
-	
-	UPROPERTY(EditAnywhere,Category = "Attack")
-		UAnimMontage* AttackAnim;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "components")
 		USAttributeComponent* AtrributeComp;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "components")
+	USActionComponent* ActionComp;
 
 	void MoveForward(float value);
 
 	void MoveRight(float value);
 
-	void PrimaryAttack();
+	void SprintStart();
 
-	void PrimaryAttack_TimeElapsed();
+	void SprintStop();
+
+	void PrimaryAttack();
 
 	void BlackHoleAttack();
 
-	void BlackHoleAttack_TimeElapsed();
-
 	void Dash();
 
-	void Dash_TimeElapsed();
-
 	void PrimaryInteract();
-	
-	void SpawnProjectile(TSubclassOf<AActor> ClassToSpawn);
 
 	UFUNCTION()
 	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
@@ -88,6 +68,7 @@ protected:
 	UFUNCTION()
 	virtual void PostInitializeComponents() override;
 
+	virtual FVector GetPawnViewLocation() const override;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -95,4 +76,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(Exec)
+		void HealSelf(float Amount = 100.0f);
 };

@@ -29,6 +29,8 @@ ASProjectileBase::ASProjectileBase()
 	MoveComp->bRotationRemainsVertical = true;
 	MoveComp->bInitialVelocityInLocalSpace = true;
 	InitialLifeSpan = 5.0f;
+
+	SetReplicates(true);
 }
 
 void ASProjectileBase::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

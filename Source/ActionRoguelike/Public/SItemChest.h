@@ -13,12 +13,21 @@ class ACTIONROGUELIKE_API ASItemChest : public AActor,public ISGameplayInterface
 	GENERATED_BODY()
 
 public:
-	void Interact_Implementation(APawn* InstigatorPawn);
-
-protected:
 
 	UPROPERTY(EditAnywhere)
 	float TargetPitch;
+
+	void Interact_Implementation(APawn* InstigatorPawn);
+
+	void OnActorLoaded_Implementation();
+
+protected:
+
+	UPROPERTY(ReplicatedUsing = "OnRep_LidOpened", BlueprintReadOnly)
+	bool bLidOpened;
+
+	UFUNCTION()
+	void OnRep_LidOpened();
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Mesh")
 	UStaticMeshComponent* BaseMesh;
@@ -26,12 +35,8 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Mesh")
 	UStaticMeshComponent* LidMesh;
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	// Sets default values for this actor's properties
 	ASItemChest();

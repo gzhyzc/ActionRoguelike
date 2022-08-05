@@ -7,6 +7,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SInteractionComponent.h"
 #include "GameFramework/PlayerController.h"
+#include "SActionComponent.h"
+#include "SAttributeComponent.h"
 
 // Sets default values
 ASCharacter::ASCharacter()
@@ -25,11 +27,12 @@ ASCharacter::ASCharacter()
 	
 	AtrributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComp");
 
+	ActionComp = CreateDefaultSubobject<USActionComponent>("ActionComp");
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	
 	bUseControllerRotationYaw = false;
 
-	AttackAnimDelay = 0.2f;
+	TimeToHitParamName = "TimeToHit";
 }
 
 // Called to bind functionality to input
@@ -47,7 +50,15 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &ASCharacter::Dash);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed, this, &ASCharacter::PrimaryInteract);
 
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASCharacter::SprintStart);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASCharacter::SprintStop);
+
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASCharacter::Jump);
+}
+
+void ASCharacter::HealSelf(float Amount /*= 100.0f*/)
+{
+	AtrributeComp->ApplyHealthChange(this, Amount);
 }
 
 // Called when the game starts or when spawned
@@ -77,79 +88,29 @@ void ASCharacter::MoveRight(float value)
 	AddMovementInput(RightVector,value);
 }
 
-void ASCharacter::PrimaryAttack()
+void ASCharacter::SprintStart()
 {
-	PlayAnimMontage(AttackAnim);
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack,this,&ASCharacter::PrimaryAttack_TimeElapsed,AttackAnimDelay);
-	//GetWorldTimerManager().ClearTimer(TimerHandle_PrimaryAttack);
-	
+	ActionComp->StartActionByName(this,"Sprint");
 }
 
-void ASCharacter::PrimaryAttack_TimeElapsed()
+void ASCharacter::SprintStop()
 {
-	SpawnProjectile(ProjectileClass);
+	ActionComp->StopActionByName(this, "Sprint");
+}
+
+void ASCharacter::PrimaryAttack()
+{
+	ActionComp->StartActionByName(this, "PrimaryAttack");
 }
 
 void ASCharacter::BlackHoleAttack()
 {
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_BlackHoleAttack, this, &ASCharacter::BlackHoleAttack_TimeElapsed, AttackAnimDelay);
-}
-
-void ASCharacter::BlackHoleAttack_TimeElapsed()
-{
-	SpawnProjectile(BlackHoleProjectileClass);
+	ActionComp->StartActionByName(this, "BlackHoleAttack");
 }
 
 void ASCharacter::Dash()
 {
-	PlayAnimMontage(AttackAnim);
-
-	GetWorldTimerManager().SetTimer(TimerHandle_Dash, this, &ASCharacter::Dash_TimeElapsed, AttackAnimDelay);
-}
-
-void ASCharacter::Dash_TimeElapsed()
-{
-	SpawnProjectile(DashProjectileClass);
-}
-
-void ASCharacter::SpawnProjectile(TSubclassOf<AActor> ClassToSpawn)
-{
-	if (ensure(ClassToSpawn))
-	{
-		FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Instigator = this;
-
-		FCollisionShape Shape;
-		Shape.SetSphere(20.0f);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(this);
-
-		FCollisionObjectQueryParams ObjParams;
-		ObjParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-		ObjParams.AddObjectTypesToQuery(ECC_WorldStatic);
-		ObjParams.AddObjectTypesToQuery(ECC_Pawn);
-
-		FVector TraceStart = CameraComp->GetComponentLocation();
-		FVector TraceEnd = CameraComp->GetComponentLocation() + (GetControlRotation().Vector() * 5000);
-
-		FHitResult Hit;
-
-		if (GetWorld()->SweepSingleByObjectType(Hit,TraceStart,TraceEnd,FQuat::Identity,ObjParams,Shape,Params))
-		{
-			TraceEnd = Hit.ImpactPoint;
-		}
-		FRotator ProjRotation = FRotationMatrix::MakeFromX(TraceEnd - HandLocation).Rotator();
-
-		FTransform SpawnTM = FTransform(ProjRotation,HandLocation);
-		GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTM, SpawnParams);
-	}
+	ActionComp->StartActionByName(this, "Dash");
 }
 
 void ASCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta)
@@ -165,6 +126,11 @@ void ASCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	AtrributeComp->OnHealthChanged.AddDynamic(this,&ASCharacter::OnHealthChanged);
+}
+
+FVector ASCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
 }
 
 void ASCharacter::PrimaryInteract()

@@ -3,13 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EnvironmentQuery/EnvQuery.h"
-#include "EnvironmentQuery/EnvQueryInstanceBlueprintWrapper.h"
 #include "GameFramework/GameModeBase.h"
+#include "EnvironmentQuery/EnvQueryTypes.h"
+#include "Engine/DataTable.h"
 #include "SGameModeBase.generated.h"
 
 class UEnvQuery;
+class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
+class USSaveGame;
+class UDataTable;
+class USMonsterData;
+
 /**
  * 
  */
@@ -34,15 +39,41 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	float SpawnTimerInterval;
 	
-	UFUNCTION()
-	void SpawnBotTimerElapsed();
-	
-	UFUNCTION()
-	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,EEnvQueryStatus::Type QueryStatus);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "AI")
+		int32 CreditsPerKill;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Powerups")
+		TArray<TSubclassOf<AActor>> PowerupClasses;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Powerups")
+		UEnvQuery* PowerupSpawnQuery;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Powerups")
+		int32 DesiredPowerupCount;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Powerups")
+		float RequiredPowerupDistance;
+
+	UFUNCTION()
+		void SpawnBotTimerElapsed();
+
+	UFUNCTION()
+		void OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	UFUNCTION()
+		void OnPowerupSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+	UFUNCTION()
+		void RespawnPlayerElapsed(AController* controller);
 public:
 
 	ASGameModeBase();
 	
+	virtual void OnActorKilled(AActor* VictimActor, AActor* Killer);
+
 	virtual void StartPlay() override;
+
+	UFUNCTION(Exec)
+	void KillAll();
+
 };

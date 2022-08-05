@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PhysicsEngine/RadialForceComponent.h"
 #include "SExplosiveBarrel.generated.h"
+
+class UStaticMeshComponent;
+class URadialForceComponent;
+
 
 UCLASS()
 class ACTIONROGUELIKE_API ASExplosiveBarrel : public AActor

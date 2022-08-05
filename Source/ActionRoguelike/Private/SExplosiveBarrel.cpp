@@ -4,6 +4,7 @@
 #include "SExplosiveBarrel.h"
 #include "DrawDebugHelpers.h"
 #include "SAttributeComponent.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 
 
 // Sets default values
