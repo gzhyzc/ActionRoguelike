@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SSaveGame.h"
 #include "GameFramework/PlayerState.h"
 #include "SPlayerState.generated.h"
 
@@ -34,4 +35,10 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FOnCreditsChanged OnCreditsChanged;
+	
+	UFUNCTION(BlueprintNativeEvent)
+		void SavePlayerState(USSaveGame* SaveObject);
+
+	UFUNCTION(BlueprintNativeEvent)
+		void LoadPlayerState(USSaveGame* SaveObject);
 };
